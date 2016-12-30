@@ -1,40 +1,50 @@
 import { createStore } from 'redux'
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-  // this is the reducer function.
-function counter (state = 0, action) {
-  if (action.type === 'INCREMENT') {
-    return state + 1
-  } else if (action.type === 'DECREMENT') {
-    return state - 1
-  } else {
-    return state
-  }
-}
+import expect from 'expect'
+import deepFreeze from 'deep-freeze'
 
 (function () {
-  const Counter = ({ value, onIncrement, onDecrement }) => (
-    <div>
-      <h1>{value}</h1>
-      <button onClick={onIncrement}>+</button>
-      <button onClick={onDecrement}>-</button>
-    </div>
-  )
-  const render = () => {
-    ReactDOM.render(
-      <Counter
-        value={store.getState()}
-        onIncrement={() => {
-          store.dispatch({ type: 'INCREMENT' })
-        }}
-        onDecrement={() => {
-          store.dispatch({ type: 'DECREMENT' })
-        }} />,
-      document.querySelector('#foo')
-    )
+  const todos = (state = [], action) => {
+    if (action.type === 'ADD_TODO') {
+      return [
+        ...state,
+        {
+          id: action.id,
+          text: action.text,
+          completed: false
+        }
+      ]
+    } else {
+      return state
+    }
   }
-  let store = createStore(counter)
-  store.subscribe(render)
-  render()
+
+  const testAddTodo = () => {
+    const stateBefore = []
+
+    const action = {
+      type: 'ADD_TODO',
+      id: 0,
+      text: 'Learn Redux'
+    }
+
+    const stateAfter = [
+      {
+        id: 0,
+        text: 'Learn Redux',
+        completed: false
+      }
+    ]
+
+    deepFreeze(stateBefore)
+    deepFreeze(action)
+
+    expect(
+      todos(stateBefore, action)
+    ).toEqual(stateAfter)
+  }
+
+  testAddTodo()
+  console.log('All test passed')
 })()
