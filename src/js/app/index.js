@@ -5,23 +5,29 @@ import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
 (function () {
+  const todo = (state, action) => {
+    if (action.type === 'ADD_TODO') {
+      return {
+        id: action.id,
+        text: action.text,
+        completed: false
+      }
+    } else if (action.type === 'TOGGLE_TODO') {
+      if (state.id !== action.id) {
+        return state
+      }
+      return Object.assign({}, state, { completed: !state.completed })
+    }
+  }
+
   const todos = (state = [], action) => {
     if (action.type === 'ADD_TODO') {
       return [
         ...state,
-        {
-          id: action.id,
-          text: action.text,
-          completed: false
-        }
+        todo(undefined, action)
       ]
     } else if (action.type === 'TOGGLE_TODO') {
-      return state.map((todo) => {
-        if (todo.id !== action.id) {
-          return todo
-        }
-        return Object.assign({}, todo, { completed: !todo.completed })
-      })
+      return state.map((t) => todo(t, action))
     } else {
       return state
     }
