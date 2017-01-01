@@ -1,4 +1,4 @@
-import { createStore } from 'redux'
+import { createStore, combineReducers } from 'redux'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import expect from 'expect'
@@ -47,6 +47,7 @@ import deepFreeze from 'deep-freeze'
   }
 
   // reducer function
+/*
   const todoApp = (state = {}, action) => {
     return {
       // Call the `todos()` reducer from last section
@@ -54,6 +55,13 @@ import deepFreeze from 'deep-freeze'
       visibilityFilter: visibilityFilter(state.visibilityFilter, action)
     }
   }
+*/
+
+  // Principal Reducer function.
+  const todoApp = combineReducers({ // This is a good practice.
+    todos,
+    visibilityFilter
+  })
 
   const store = createStore(todoApp)
   console.log('Initial state:')
