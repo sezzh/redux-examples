@@ -5,6 +5,7 @@ import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
 (function () {
+  // reducer function
   const todo = (state, action) => {
     if (action.type === 'ADD_TODO') {
       return {
@@ -20,11 +21,12 @@ import deepFreeze from 'deep-freeze'
     }
   }
 
+  // reducer function
   const todos = (state = [], action) => {
     if (action.type === 'ADD_TODO') {
       return [
         ...state,
-        todo(undefined, action)
+        todo(state, action)
       ]
     } else if (action.type === 'TOGGLE_TODO') {
       return state.map((t) => todo(t, action))
@@ -32,6 +34,73 @@ import deepFreeze from 'deep-freeze'
       return state
     }
   }
+
+  // reducer function
+  const visibilityFilter = (state = 'SHOW_ALL', action) => {
+    console.log('Current state of visibilityFilter:')
+    console.dir(state)
+    if (action.type === 'SET_VISIBILITY_FILTER') {
+      return action.filter
+    } else {
+      return state
+    }
+  }
+
+  // reducer function
+  const todoApp = (state = {}, action) => {
+    return {
+      // Call the `todos()` reducer from last section
+      todos: todos(state.todos, action),
+      visibilityFilter: visibilityFilter(state.visibilityFilter, action)
+    }
+  }
+
+  const store = createStore(todoApp)
+  console.log('Initial state:')
+  console.log(store.getState())
+  console.log('-------------')
+
+  console.log('dispatching ADD_TODO:')
+  store.dispatch({
+    type: 'ADD_TODO',
+    id: 0,
+    text: 'Learn Redux'
+  })
+
+  console.log('Current state:')
+  console.log(store.getState())
+  console.log('-------------')
+
+  console.log('dispatching ADD_TODO:')
+  store.dispatch({
+    type: 'ADD_TODO',
+    id: 1,
+    text: 'Go shopping'
+  })
+
+  console.log('Current state:')
+  console.log(store.getState())
+  console.log('-------------')
+
+  console.log('Dispatching TOGGLE_TODO')
+  store.dispatch({
+    type: 'TOGGLE_TODO',
+    id: 0
+  })
+
+  console.log('Current state:')
+  console.log(store.getState())
+  console.log('-------------')
+
+  console.log('Dispatching SET_VISIBILITY_FILTER')
+  store.dispatch({
+    type: 'SET_VISIBILITY_FILTER',
+    filter: 'SHOW_COMPLETED'
+  })
+
+  console.log('Current state:')
+  console.log(store.getState())
+  console.log('-------------')
 
   const testAddTodo = () => {
     const stateBefore = []
