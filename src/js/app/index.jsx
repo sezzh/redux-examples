@@ -8,22 +8,39 @@ import deepFreeze from 'deep-freeze'
   let nextTodoId = 0
 
   class TodoApp extends React.Component {
-    constructor () { super() }
+    constructor () {
+      super()
+      this.addTodo = this.addTodo.bind(this)
+      this.updateView = this.updateView.bind(this)
+      this.state = {
+        todos: []
+      }
+    }
+
+    addTodo () {
+      store.dispatch({
+        type: 'ADD_TODO',
+        text: 'Test',
+        id: nextTodoId++
+      })
+    }
+
+    componentDidMount () {
+      store.subscribe(this.updateView)
+    }
+
+    updateView () {
+      this.setState({ todos: store.getState().todos })
+    }
 
     render () {
       return (
         <div>
-          <button onClick={() => {
-            store.dispatch({
-              type: 'ADD_TODO',
-              text: 'Test',
-              id: nextTodoId++
-            })
-          }}>
+          <button onClick={this.addTodo}>
             Add Todo
           </button>
           <ul>
-            {this.props.todos.map((todo) => {
+            {this.state.todos.map((todo) => {
               return <li key={todo.id}>{todo.text}</li>
             })}
           </ul>
@@ -78,19 +95,10 @@ import deepFreeze from 'deep-freeze'
     visibilityFilter
   })
 
-  const render = () => {
-    ReactDOM.render(
-      // Render the TodoApp component to the <dev> with id 'root'
-      <TodoApp
-        todos={store.getState().todos} />,
-      document.querySelector('#foo')
-    )
-  }
   const store = createStore(todoApp)
-  store.subscribe(render)
-  store.subscribe(() => {
-    console.log('Current state: ')
-    console.log(store.getState())
-  })
-  render()
+  ReactDOM.render(
+    // Render the TodoApp component to the <dev> with id 'root'
+    <TodoApp />,
+    document.querySelector('#foo')
+  )
 })()
