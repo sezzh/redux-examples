@@ -8,17 +8,30 @@ import deepFreeze from 'deep-freeze'
   let nextTodoId = 0
 
   class TodoApp extends React.Component {
-    constructor () { super() }
+    constructor () {
+      super()
+      this.input = ''
+      this.getInputData = this.getInputData.bind(this)
+    }
+
+    getInputData (node) {
+      console.log('node value:')
+      console.log(node.value)
+      this.input = node
+    }
 
     render () {
       return (
         <div>
+          <input ref={this.getInputData} />
           <button onClick={() => {
+            console.log(this.input.value)
             store.dispatch({
               type: 'ADD_TODO',
-              text: 'Test',
+              text: this.input.value,
               id: nextTodoId++
             })
+            this.input.value = ''
           }}>
             Add Todo
           </button>
