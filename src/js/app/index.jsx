@@ -7,6 +7,19 @@ import deepFreeze from 'deep-freeze'
 (function () {
   let nextTodoId = 0
 
+  // This is another react component but so much simple!
+  const FilterLink = ({filter, children}) => {
+    return (
+      <a href='#' onClick={e => {
+        e.preventDefault()
+        store.dispatch({
+          type: 'SET_VISIBILITY_FILTER',
+          filter
+        })
+      }}>{children}</a>
+    )
+  }
+
   class TodoApp extends React.Component {
     constructor () {
       super()
@@ -21,6 +34,10 @@ import deepFreeze from 'deep-freeze'
     }
 
     render () {
+      const visibleTodos = getVisibleTodos(
+        this.props.todos,
+        this.props.visibilityFilter
+      )
       return (
         <div>
           <input ref={this.getInputData} />
@@ -36,7 +53,7 @@ import deepFreeze from 'deep-freeze'
             Add Todo
           </button>
           <ul>
-            {this.props.todos.map((todo) => {
+            {visibleTodos.map((todo) => {
               return <li
                 key={todo.id}
                 onClick={() => {
@@ -50,10 +67,39 @@ import deepFreeze from 'deep-freeze'
                 }}>{todo.text}</li>
             })}
           </ul>
+          <p>
+            Show: {' '}
+            <FilterLink filter='SHOW_ALL'>
+              all
+            </FilterLink>
+            {' '}
+            <FilterLink filter='SHOW_ACTIVE'>
+              active
+            </FilterLink>
+            {' '}
+            <FilterLink filter='SHOW_COMPLETED'>
+              completed
+            </FilterLink>
+          </p>
         </div>
       )
     }
   }
+
+  const getVisibleTodos = (todos, filter) => {
+    switch (filter) {
+      case 'SHOW_ALL':
+        return todos
+      case 'SHOW_COMPLETED':
+        return todos.filter(t => t.completed)
+      case 'SHOW_ACTIVE':
+        return todos.filter(t => !t.completed)
+      default:
+        return todos
+
+    }
+  }
+
   // reducer function
   const todo = (state, action) => {
     if (action.type === 'ADD_TODO') {
@@ -105,7 +151,7 @@ import deepFreeze from 'deep-freeze'
     ReactDOM.render(
       // Render the TodoApp component to the <dev> with id 'root'
       <TodoApp
-        todos={store.getState().todos} />,
+        {...store.getState()} />,
       document.querySelector('#foo')
     )
   }
