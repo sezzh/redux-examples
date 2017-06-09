@@ -151,7 +151,8 @@ import deepFreeze from 'deep-freeze'
     ReactDOM.render(
       // Render the TodoApp component to the <dev> with id 'root'
       <TodoApp
-        {...store.getState()} />,
+        todos={store.getState().todos}
+        visibilityFilter={store.getState().visibilityFilter} />,
       document.querySelector('#foo')
     )
   }
