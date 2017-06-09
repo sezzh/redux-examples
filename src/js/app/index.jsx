@@ -8,7 +8,10 @@ import deepFreeze from 'deep-freeze'
   let nextTodoId = 0
 
   // This is another react component but so much simple!
-  const FilterLink = ({filter, children}) => {
+  const FilterLink = ({filter, currentFilter, children}) => {
+    if (filter === currentFilter) {
+      return (<span>{children}</span>)
+    }
     return (
       <a href='#' onClick={e => {
         e.preventDefault()
@@ -69,15 +72,21 @@ import deepFreeze from 'deep-freeze'
           </ul>
           <p>
             Show: {' '}
-            <FilterLink filter='SHOW_ALL'>
+            <FilterLink
+              filter='SHOW_ALL'
+              currentFilter={this.props.visibilityFilter}>
               all
             </FilterLink>
             {' '}
-            <FilterLink filter='SHOW_ACTIVE'>
+            <FilterLink
+              filter='SHOW_ACTIVE'
+              currentFilter={this.props.visibilityFilter}>
               active
             </FilterLink>
             {' '}
-            <FilterLink filter='SHOW_COMPLETED'>
+            <FilterLink
+              filter='SHOW_COMPLETED'
+              currentFilter={this.props.visibilityFilter}>
               completed
             </FilterLink>
           </p>
