@@ -5,161 +5,68 @@ import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
 (function () {
-  let nextTodoId = 0
 
-  // This is another react component but so much simple!
-  const FilterLink = ({filter, children}) => {
-    return (
-      <a href='#' onClick={e => {
-        e.preventDefault()
-        store.dispatch({
-          type: 'SET_VISIBILITY_FILTER',
-          filter
-        })
-      }}>{children}</a>
-    )
-  }
-
-  class TodoApp extends React.Component {
+  class InputContainer extends React.Component {
     constructor () {
       super()
-      this.input = ''
-      this.getInputData = this.getInputData.bind(this)
-    }
-
-    getInputData (node) {
-      console.log('node value:')
-      console.log(node.value)
-      this.input = node
     }
 
     render () {
-      const visibleTodos = getVisibleTodos(
-        this.props.todos,
-        this.props.visibilityFilter
+      return (
+        <label>{this.props.tuvalor}</label>
       )
+    }
+  }
+
+  class ButtonComponent extends React.Component {
+    constructor() {
+      super()
+      this.accionBoton = this.accionBoton.bind(this)
+    }
+
+    accionBoton () {
+      var mensaje = 'hola soy fabiola'
+      this.props.handleButton(mensaje)
+    }
+
+    render() {
+      return (
+        <button onClick={this.accionBoton}>{this.props.value}</button>
+      )
+    }
+  }
+
+  class HelloComponent extends React.Component {
+    constructor () {
+      super()
+      this.botoncitoBorra = this.botoncitoBorra.bind(this)
+      this.state = {
+        'inputValue': 'hola escribe tu nombre',
+        'btnlabel1': 'activar',
+        'btnlabel2': 'borrar'
+      }
+    }
+
+    componentDidMount () {
+      debugger
+      this.setState({'inputValue': 'otro mensaje'})
+    }
+
+    botoncitoBorra (mensaje) {
+      this.setState({'inputValue': mensaje})
+    }
+
+    render () {
       return (
         <div>
-          <input ref={this.getInputData} />
-          <button onClick={() => {
-            console.log(this.input.value)
-            store.dispatch({
-              type: 'ADD_TODO',
-              text: this.input.value,
-              id: nextTodoId++
-            })
-            this.input.value = ''
-          }}>
-            Add Todo
-          </button>
-          <ul>
-            {visibleTodos.map((todo) => {
-              return <li
-                key={todo.id}
-                onClick={() => {
-                  store.dispatch({
-                    type: 'TOGGLE_TODO',
-                    id: todo.id
-                  })
-                }}
-                style={{
-                  textDecoration: todo.completed ? 'line-through' : 'none'
-                }}>{todo.text}</li>
-            })}
-          </ul>
-          <p>
-            Show: {' '}
-            <FilterLink filter='SHOW_ALL'>
-              all
-            </FilterLink>
-            {' '}
-            <FilterLink filter='SHOW_ACTIVE'>
-              active
-            </FilterLink>
-            {' '}
-            <FilterLink filter='SHOW_COMPLETED'>
-              completed
-            </FilterLink>
-          </p>
+          <InputContainer tuvalor={this.state.inputValue} />
+          <button>{this.state.btnlabel1}</button>
+          <ButtonComponent handleButton={this.botoncitoBorra} value={this.state.btnlabel2} />
         </div>
       )
     }
   }
 
-  const getVisibleTodos = (todos, filter) => {
-    switch (filter) {
-      case 'SHOW_ALL':
-        return todos
-      case 'SHOW_COMPLETED':
-        return todos.filter(t => t.completed)
-      case 'SHOW_ACTIVE':
-        return todos.filter(t => !t.completed)
-      default:
-        return todos
+  ReactDOM.render(<HelloComponent/>, document.querySelector('#foo'))
 
-    }
-  }
-
-  // reducer function
-  const todo = (state, action) => {
-    if (action.type === 'ADD_TODO') {
-      return {
-        id: action.id,
-        text: action.text,
-        completed: false
-      }
-    } else if (action.type === 'TOGGLE_TODO') {
-      if (state.id !== action.id) {
-        return state
-      }
-      return Object.assign({}, state, { completed: !state.completed })
-    } else {
-      return state
-    }
-  }
-
-  // reducer function
-  const todos = (state = [], action) => {
-    if (action.type === 'ADD_TODO') {
-      return [
-        ...state,
-        todo(state, action)
-      ]
-    } else if (action.type === 'TOGGLE_TODO') {
-      return state.map((t) => todo(t, action))
-    } else {
-      return state
-    }
-  }
-
-  // reducer function
-  const visibilityFilter = (state = 'SHOW_ALL', action) => {
-    if (action.type === 'SET_VISIBILITY_FILTER') {
-      return action.filter
-    } else {
-      return state
-    }
-  }
-
-  // Principal Reducer function.
-  const todoApp = combineReducers({ // This is a good practice.
-    todos,
-    visibilityFilter
-  })
-
-  const render = () => {
-    ReactDOM.render(
-      // Render the TodoApp component to the <dev> with id 'root'
-      <TodoApp
-        {...store.getState()} />,
-      document.querySelector('#foo')
-    )
-  }
-  const store = createStore(todoApp)
-  store.subscribe(render)
-  store.subscribe(() => {
-    console.log('Current state: ')
-    console.log(store.getState())
-  })
-  render()
 })()
