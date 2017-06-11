@@ -37,7 +37,7 @@ import deepFreeze from 'deep-freeze'
         <Todo
           key={todo.id}
           {...todo}
-          onClick={() => onTodoClick(todo.id)} />
+          onClick={() => { onTodoClick(todo.id) }} />
       )}
     </ul>
  )
@@ -75,12 +75,12 @@ import deepFreeze from 'deep-freeze'
             Add Todo
           </button>
           <TodoList
-            todos={visibleTodos} onTodoClick={id =>
+            todos={visibleTodos} onTodoClick={(id) => {
               store.dispatch({
                 type: 'TOGGLE_TODO',
-                id
+                id: id
               })
-            } />
+            }} />
           <p>
             Show: {' '}
             <FilterLink
@@ -176,7 +176,10 @@ import deepFreeze from 'deep-freeze'
       document.querySelector('#foo')
     )
   }
-  const store = createStore(todoApp)
+  const store = createStore(
+    todoApp,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
   store.subscribe(render)
   store.subscribe(() => {
     console.log('Current state: ')
