@@ -8,16 +8,51 @@ import deepFreeze from 'deep-freeze'
   let nextTodoId = 0
 
   // This is another react component but so much simple!
-  const FilterLink = ({filter, currentFilter, children, onFilterClick}) => {
-    if (filter === currentFilter) {
+  const Link = ({active, children, onFilterClick}) => {
+    if (active) {
       return (<span>{children}</span>)
     }
     return (
       <a href='#' onClick={(event) => {
         event.preventDefault()
-        onFilterClick(filter)
+        onFilterClick()
       }}>{children}</a>
     )
+  }
+
+  /**
+   * This is a container.
+   * In the render method it calculates if the link component should be
+   *    available to click. It also sends the functionality to dispatch an
+   *    action for the onClick method of the link component.
+   */
+  class FilterLink extends React.Component {
+    componentDidMount () {
+      this.unsubscribe = store.subscribe(() => {
+        this.forceUpdate()
+      })
+    }
+
+    componentWillUnmount () {
+      this.unsubscribe()
+    }
+
+    render () {
+      const props = this.props
+      const state = store.getState()
+      return (
+        <Link
+          active={props.filter === state.visibilityFilter}
+          onFilterClick={() => {
+            store.dispatch({
+              type: 'SET_VISIBILITY_FILTER',
+              filter: props.filter
+            })
+          }} >
+          {props.children}
+        </Link>
+      )
+    }
   }
 
   const Todo = ({onClick, completed, text}) => (
@@ -56,32 +91,25 @@ import deepFreeze from 'deep-freeze'
     )
   }
 
-  const Footer = ({visibilityFilter, onFilterClick}) => (
+  const Footer = () => (
     <p>
       Show: {' '}
       <FilterLink
-        filter='SHOW_ALL'
-        currentFilter={visibilityFilter}
-        onFilterClick={onFilterClick}>
+        filter='SHOW_ALL'>
         all
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_ACTIVE'
-        currentFilter={visibilityFilter}
-        onFilterClick={onFilterClick}>
+        filter='SHOW_ACTIVE'>
         active
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_COMPLETED'
-        currentFilter={visibilityFilter}
-        onFilterClick={onFilterClick}>
+        filter='SHOW_COMPLETED'>
         completed
       </FilterLink>
     </p>
   )
-
 
   const TodoApp = ({todos, visibilityFilter}) => {
     const visibleTodos = getVisibleTodos(
@@ -107,14 +135,7 @@ import deepFreeze from 'deep-freeze'
             })
           }}
         />
-        <Footer
-          visibilityFilter={visibilityFilter}
-          onFilterClick={(filter) => {
-            store.dispatch({
-              type: 'SET_VISIBILITY_FILTER',
-              filter: filter
-            })
-          }} />
+        <Footer />
       </div>
     )
   }
