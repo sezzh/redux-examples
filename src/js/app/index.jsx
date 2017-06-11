@@ -8,17 +8,14 @@ import deepFreeze from 'deep-freeze'
   let nextTodoId = 0
 
   // This is another react component but so much simple!
-  const FilterLink = ({filter, currentFilter, children}) => {
+  const FilterLink = ({filter, currentFilter, children, onFilterClick}) => {
     if (filter === currentFilter) {
       return (<span>{children}</span>)
     }
     return (
-      <a href='#' onClick={e => {
-        e.preventDefault()
-        store.dispatch({
-          type: 'SET_VISIBILITY_FILTER',
-          filter
-        })
+      <a href='#' onClick={(event) => {
+        event.preventDefault()
+        onFilterClick(filter)
       }}>{children}</a>
     )
   }
@@ -40,7 +37,50 @@ import deepFreeze from 'deep-freeze'
           onClick={() => { onTodoClick(todo.id) }} />
       )}
     </ul>
- )
+  )
+
+  const AddTodo = ({onAddClick}) => {
+    let input
+    return (
+      <div>
+        <input ref={(node) => {
+          input = node
+        }} />
+        <button onClick={() => {
+          onAddClick(input.value)
+          input.value = ''
+        }}>
+        Add Todo
+        </button>
+      </div>
+    )
+  }
+
+  const Footer = ({visibilityFilter, onFilterClick}) => (
+    <p>
+      Show: {' '}
+      <FilterLink
+        filter='SHOW_ALL'
+        currentFilter={visibilityFilter}
+        onFilterClick={onFilterClick}>
+        all
+      </FilterLink>
+      {' '}
+      <FilterLink
+        filter='SHOW_ACTIVE'
+        currentFilter={visibilityFilter}
+        onFilterClick={onFilterClick}>
+        active
+      </FilterLink>
+      {' '}
+      <FilterLink
+        filter='SHOW_COMPLETED'
+        currentFilter={visibilityFilter}
+        onFilterClick={onFilterClick}>
+        completed
+      </FilterLink>
+    </p>
+  )
 
   class TodoApp extends React.Component {
     constructor () {
@@ -62,45 +102,31 @@ import deepFreeze from 'deep-freeze'
       )
       return (
         <div>
-          <input ref={this.getInputData} />
-          <button onClick={() => {
-            console.log(this.input.value)
-            store.dispatch({
-              type: 'ADD_TODO',
-              text: this.input.value,
-              id: nextTodoId++
-            })
-            this.input.value = ''
-          }}>
-            Add Todo
-          </button>
+          <AddTodo
+            onAddClick={(text) => {
+              store.dispatch({
+                type: 'ADD_TODO',
+                id: nextTodoId++,
+                text: text
+              })
+            }}
+          />
           <TodoList
             todos={visibleTodos} onTodoClick={(id) => {
               store.dispatch({
                 type: 'TOGGLE_TODO',
                 id: id
               })
+            }}
+          />
+          <Footer
+            visibilityFilter={this.props.visibilityFilter}
+            onFilterClick={(filter) => {
+              store.dispatch({
+                type: 'SET_VISIBILITY_FILTER',
+                filter: filter
+              })
             }} />
-          <p>
-            Show: {' '}
-            <FilterLink
-              filter='SHOW_ALL'
-              currentFilter={this.props.visibilityFilter}>
-              all
-            </FilterLink>
-            {' '}
-            <FilterLink
-              filter='SHOW_ACTIVE'
-              currentFilter={this.props.visibilityFilter}>
-              active
-            </FilterLink>
-            {' '}
-            <FilterLink
-              filter='SHOW_COMPLETED'
-              currentFilter={this.props.visibilityFilter}>
-              completed
-            </FilterLink>
-          </p>
         </div>
       )
     }
