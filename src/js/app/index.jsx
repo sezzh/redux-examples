@@ -82,54 +82,41 @@ import deepFreeze from 'deep-freeze'
     </p>
   )
 
-  class TodoApp extends React.Component {
-    constructor () {
-      super()
-      this.input = ''
-      this.getInputData = this.getInputData.bind(this)
-    }
 
-    getInputData (node) {
-      console.log('node value:')
-      console.log(node.value)
-      this.input = node
-    }
-
-    render () {
-      const visibleTodos = getVisibleTodos(
-        this.props.todos,
-        this.props.visibilityFilter
-      )
-      return (
-        <div>
-          <AddTodo
-            onAddClick={(text) => {
-              store.dispatch({
-                type: 'ADD_TODO',
-                id: nextTodoId++,
-                text: text
-              })
-            }}
-          />
-          <TodoList
-            todos={visibleTodos} onTodoClick={(id) => {
-              store.dispatch({
-                type: 'TOGGLE_TODO',
-                id: id
-              })
-            }}
-          />
-          <Footer
-            visibilityFilter={this.props.visibilityFilter}
-            onFilterClick={(filter) => {
-              store.dispatch({
-                type: 'SET_VISIBILITY_FILTER',
-                filter: filter
-              })
-            }} />
-        </div>
-      )
-    }
+  const TodoApp = ({todos, visibilityFilter}) => {
+    const visibleTodos = getVisibleTodos(
+      todos,
+      visibilityFilter
+    )
+    return (
+      <div>
+        <AddTodo
+          onAddClick={(text) => {
+            store.dispatch({
+              type: 'ADD_TODO',
+              id: nextTodoId++,
+              text: text
+            })
+          }}
+        />
+        <TodoList
+          todos={visibleTodos} onTodoClick={(id) => {
+            store.dispatch({
+              type: 'TOGGLE_TODO',
+              id: id
+            })
+          }}
+        />
+        <Footer
+          visibilityFilter={visibilityFilter}
+          onFilterClick={(filter) => {
+            store.dispatch({
+              type: 'SET_VISIBILITY_FILTER',
+              filter: filter
+            })
+          }} />
+      </div>
+    )
   }
 
   const getVisibleTodos = (todos, filter) => {
