@@ -67,7 +67,7 @@ import deepFreeze from 'deep-freeze'
    */
   class FilterLink extends React.Component {
     componentDidMount () {
-      const { store } = this.props
+      const { store } = this.context
       this.unsubscribe = store.subscribe(() => {
         this.forceUpdate()
       })
@@ -79,7 +79,7 @@ import deepFreeze from 'deep-freeze'
 
     render () {
       const props = this.props
-      const { store } = props
+      const { store } = this.context
       const state = store.getState()
       return (
         <Link
@@ -95,10 +95,11 @@ import deepFreeze from 'deep-freeze'
       )
     }
   }
+  FilterLink.contextTypes = {store: React.PropTypes.object}
 
   class VisibleTodoList extends React.Component {
     componentDidMount () {
-      const { store } = this.props
+      const { store } = this.context
       this.unsubscribe = store.subscribe(() => {
         this.forceUpdate()
       })
@@ -110,7 +111,7 @@ import deepFreeze from 'deep-freeze'
 
     render () {
       const props = this.props
-      const { store } = props
+      const { store } = this.context
       const state = store.getState()
       return (
         <TodoList
@@ -124,6 +125,20 @@ import deepFreeze from 'deep-freeze'
       )
     }
   }
+  VisibleTodoList.contextTypes = {store: React.PropTypes.object}
+
+  // providing store via context
+  class Provider extends React.Component {
+    getChildContext () {
+      return { store: this.props.store }
+    }
+    render () {
+      // this will return whatever its child is.
+      return this.props.children
+    }
+  }
+  // this is necesary to get the context in the children.
+  Provider.childContextTypes = {store: React.PropTypes.object}
 
 /** ENDS React functionality containers */
 /** STARTS PRESENTATIONAL COMPONENTS */
@@ -160,7 +175,7 @@ import deepFreeze from 'deep-freeze'
     </ul>
   )
 
-  const AddTodo = ({store}) => {
+  const AddTodo = (props, {store}) => { // could be (props, context) => {}
     let input
     return (
       <div>
@@ -180,36 +195,34 @@ import deepFreeze from 'deep-freeze'
       </div>
     )
   }
+  AddTodo.contextTypes = {store: React.PropTypes.object}
 
-  const Footer = ({store}) => (
+  const Footer = () => (
     <p>
       Show: {' '}
       <FilterLink
-        filter='SHOW_ALL'
-        store={store}>
+        filter='SHOW_ALL'>
         all
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_ACTIVE'
-        store={store}>
+        filter='SHOW_ACTIVE'>
         active
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_COMPLETED'
-        store={store}>
+        filter='SHOW_COMPLETED'>
         completed
       </FilterLink>
     </p>
   )
 
-  const TodoApp = ({store}) => {
+  const TodoApp = () => {
     return (
       <div>
-        <AddTodo store={store} />
-        <VisibleTodoList store={store} />
-        <Footer store={store} />
+        <AddTodo />
+        <VisibleTodoList />
+        <Footer />
       </div>
     )
   }
@@ -239,6 +252,13 @@ import deepFreeze from 'deep-freeze'
 
   )
   */
+  // Injecting store through the provider component.
+  ReactDOM.render(
+    <Provider store={createStore(todoApp)}>
+      <TodoApp />
+    </Provider>, document.querySelector('#foo')
+  )
+  /**
   // Rendering for the first time the app.
   ReactDOM.render(
     // Render the TodoApp component to the <dev> with id 'root'
