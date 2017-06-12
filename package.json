@@ -21,6 +21,7 @@
     "expect": "^1.20.2",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
+    "react-redux": "^5.0.5",
     "redux-devtools": "^3.3.1",
     "standard": "^8.6.0",
     "webpack": "^1.14.0"

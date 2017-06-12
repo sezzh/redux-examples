@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore, combineReducers } from 'redux'
+import { Provider } from 'react-redux'
 import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
@@ -126,7 +127,7 @@ import deepFreeze from 'deep-freeze'
     }
   }
   VisibleTodoList.contextTypes = {store: React.PropTypes.object}
-
+/**
   // providing store via context
   class Provider extends React.Component {
     getChildContext () {
@@ -139,7 +140,7 @@ import deepFreeze from 'deep-freeze'
   }
   // this is necesary to get the context in the children.
   Provider.childContextTypes = {store: React.PropTypes.object}
-
+*/
 /** ENDS React functionality containers */
 /** STARTS PRESENTATIONAL COMPONENTS */
 
