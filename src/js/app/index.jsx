@@ -1,6 +1,6 @@
-import { createStore, combineReducers } from 'redux'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { createStore, combineReducers } from 'redux'
 import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
@@ -58,14 +58,6 @@ import deepFreeze from 'deep-freeze'
 
 /** END REDUCERS */
 
-  // Creating the REDUX store.
-  const store = createStore(
-    todoApp,
-    // Setting up the redux dev tools.
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-  )
-
-
 /** STARTS React functionality containers */
   /**
    * This is a container.
@@ -75,6 +67,7 @@ import deepFreeze from 'deep-freeze'
    */
   class FilterLink extends React.Component {
     componentDidMount () {
+      const { store } = this.props
       this.unsubscribe = store.subscribe(() => {
         this.forceUpdate()
       })
@@ -86,6 +79,7 @@ import deepFreeze from 'deep-freeze'
 
     render () {
       const props = this.props
+      const { store } = props
       const state = store.getState()
       return (
         <Link
@@ -104,6 +98,7 @@ import deepFreeze from 'deep-freeze'
 
   class VisibleTodoList extends React.Component {
     componentDidMount () {
+      const { store } = this.props
       this.unsubscribe = store.subscribe(() => {
         this.forceUpdate()
       })
@@ -115,6 +110,7 @@ import deepFreeze from 'deep-freeze'
 
     render () {
       const props = this.props
+      const { store } = props
       const state = store.getState()
       return (
         <TodoList
@@ -164,7 +160,7 @@ import deepFreeze from 'deep-freeze'
     </ul>
   )
 
-  const AddTodo = () => {
+  const AddTodo = ({store}) => {
     let input
     return (
       <div>
@@ -185,32 +181,35 @@ import deepFreeze from 'deep-freeze'
     )
   }
 
-  const Footer = () => (
+  const Footer = ({store}) => (
     <p>
       Show: {' '}
       <FilterLink
-        filter='SHOW_ALL'>
+        filter='SHOW_ALL'
+        store={store}>
         all
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_ACTIVE'>
+        filter='SHOW_ACTIVE'
+        store={store}>
         active
       </FilterLink>
       {' '}
       <FilterLink
-        filter='SHOW_COMPLETED'>
+        filter='SHOW_COMPLETED'
+        store={store}>
         completed
       </FilterLink>
     </p>
   )
 
-  const TodoApp = () => {
+  const TodoApp = ({store}) => {
     return (
       <div>
-        <AddTodo />
-        <VisibleTodoList />
-        <Footer />
+        <AddTodo store={store} />
+        <VisibleTodoList store={store} />
+        <Footer store={store} />
       </div>
     )
   }
@@ -232,15 +231,30 @@ import deepFreeze from 'deep-freeze'
     }
   }
 
+  /**
+  // Creating the REDUX store.
+  const store = createStore(
+    todoApp,
+    // Setting up the redux dev tools.
+
+  )
+  */
   // Rendering for the first time the app.
   ReactDOM.render(
     // Render the TodoApp component to the <dev> with id 'root'
-    <TodoApp />, document.querySelector('#foo')
+    <TodoApp
+      store={
+        createStore(
+          todoApp,
+          window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        )} />,
+        document.querySelector('#foo')
   )
-
+/**
   // just a little store sub for the console.
   store.subscribe(() => {
     console.log('Current state: ')
     console.log(store.getState())
   })
+*/
 })()
