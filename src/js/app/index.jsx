@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore, combineReducers } from 'redux'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 import expect from 'expect'
 import deepFreeze from 'deep-freeze'
 
@@ -98,6 +98,24 @@ import deepFreeze from 'deep-freeze'
   }
   FilterLink.contextTypes = {store: React.PropTypes.object}
 
+  const mapStateToProps = (state) => {
+    return {
+      todos: getVisibleTodos(state.todos, state.visibilityFilter)
+    }
+  }
+
+  const mapDispatchToProps = (dispatch) => {
+    return {
+      onTodoClick: (id) => {
+        dispatch({
+          type: 'TOGGLE_TODO',
+          id: id
+        })
+      }
+    }
+  }
+
+/**
   class VisibleTodoList extends React.Component {
     componentDidMount () {
       const { store } = this.context
@@ -116,18 +134,14 @@ import deepFreeze from 'deep-freeze'
       const state = store.getState()
       return (
         <TodoList
-          todos={getVisibleTodos(state.todos, state.visibilityFilter)}
-          onTodoClick={(id) => {
-            store.dispatch({
-              type: 'TOGGLE_TODO',
-              id: id
-            })
-          }} />
+          todos={}
+          onTodoClick={} />
       )
     }
   }
   VisibleTodoList.contextTypes = {store: React.PropTypes.object}
-/**
+*/
+  /**
   // providing store via context
   class Provider extends React.Component {
     getChildContext () {
@@ -244,6 +258,13 @@ import deepFreeze from 'deep-freeze'
 
     }
   }
+
+  // this equals to a react.Component instance Container.
+  // this is part of the react-redux lib bind.
+  const VisibleTodoList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(TodoList)
 
   /**
   // Creating the REDUX store.
