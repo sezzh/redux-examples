@@ -98,13 +98,12 @@ import deepFreeze from 'deep-freeze'
   }
   FilterLink.contextTypes = {store: React.PropTypes.object}
 
-  const mapStateToProps = (state) => {
+  const mapStateToTodoListProps = (state) => {
     return {
       todos: getVisibleTodos(state.todos, state.visibilityFilter)
     }
   }
-
-  const mapDispatchToProps = (dispatch) => {
+  const mapDispatchToTodoListProps = (dispatch) => {
     return {
       onTodoClick: (id) => {
         dispatch({
@@ -114,7 +113,6 @@ import deepFreeze from 'deep-freeze'
       }
     }
   }
-
 /**
   class VisibleTodoList extends React.Component {
     componentDidMount () {
@@ -190,7 +188,8 @@ import deepFreeze from 'deep-freeze'
     </ul>
   )
 
-  const AddTodo = (props, {store}) => { // could be (props, context) => {}
+  // refactoring to a connected component through react-redux lib
+  let AddTodo = ({dispatch}) => { // could be (props, context) => {}
     let input
     return (
       <div>
@@ -198,7 +197,7 @@ import deepFreeze from 'deep-freeze'
           input = node
         }} />
         <button onClick={() => {
-          store.dispatch({
+          dispatch({
             type: 'ADD_TODO',
             id: nextTodoId++,
             text: input.value
@@ -210,7 +209,7 @@ import deepFreeze from 'deep-freeze'
       </div>
     )
   }
-  AddTodo.contextTypes = {store: React.PropTypes.object}
+  // AddTodo.contextTypes = {store: React.PropTypes.object}
 
   const Footer = () => (
     <p>
@@ -262,10 +261,15 @@ import deepFreeze from 'deep-freeze'
   // this equals to a react.Component instance Container.
   // this is part of the react-redux lib bind.
   const VisibleTodoList = connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToTodoListProps,
+    mapDispatchToTodoListProps
   )(TodoList)
 
+  AddTodo = connect( // becuase the dispatch is always injected you could use:
+    // AddTodo = connect()(AddTodo) as well.
+    null,
+    null
+  )(AddTodo)
   /**
   // Creating the REDUX store.
   const store = createStore(
