@@ -60,12 +60,30 @@ import deepFreeze from 'deep-freeze'
 /** END REDUCERS */
 
 /** STARTS React functionality containers */
+// This a more concise way to make containers with connect react-redux
+const mapStateToLinkProps = (state, ownProps) => { // ownProps are container props
+  return {
+    active: ownProps.filter === state.visibilityFilter
+  }
+}
+const mapDispatchToLinkProps = (dispatch, ownProps) => {
+  return {
+    onFilterClick: () => {
+      dispatch({
+        type: 'SET_VISIBILITY_FILTER',
+        filter: ownProps.filter
+      })
+    }
+  }
+}
+
   /**
    * This is a container.
    * In the render method it calculates if the link component should be
    *    available to click. It also sends the functionality to dispatch an
    *    action for the onClick method of the link component.
    */
+/**
   class FilterLink extends React.Component {
     componentDidMount () {
       const { store } = this.context
@@ -97,7 +115,7 @@ import deepFreeze from 'deep-freeze'
     }
   }
   FilterLink.contextTypes = {store: React.PropTypes.object}
-
+*/
   const mapStateToTodoListProps = (state) => {
     return {
       todos: getVisibleTodos(state.todos, state.visibilityFilter)
@@ -264,6 +282,11 @@ import deepFreeze from 'deep-freeze'
     mapStateToTodoListProps,
     mapDispatchToTodoListProps
   )(TodoList)
+
+  const FilterLink = connect(
+    mapStateToLinkProps,
+    mapDispatchToLinkProps
+  )(Link)
 
   AddTodo = connect( // becuase the dispatch is always injected you could use:
     // AddTodo = connect()(AddTodo) as well.
